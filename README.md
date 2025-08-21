@@ -10,5 +10,5 @@ scripts/ - Pipeline scripts. Data ingestion, data export, cleaning, transformati
 
 templates/ - Code and notebook templates. Boilerplate files for starting a new experiment or script.
 
-experiment/ - Notebooks and whatever else. No production code. Use imports from the scripts/ folder.
+notebooks/ - Notebooks and whatever else. No production code. Use imports from the scripts/ folder.
 
