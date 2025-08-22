@@ -4,6 +4,8 @@
 
 ## Machine Learning Components
 
+- Infrastructure
+
 - Data ingress (ETL / ELT / ETLT pipeline)
 
 - Data quality monitoring
@@ -65,3 +67,13 @@ To store the models, we could use some generic cloud storage combined with DVC f
 ## Model deployment
 
 Here the name of the game is automation, but the solution is highly dependent on the model serving just like the model repository is. Model training might be triggered either manually or by some automation. The trained models are "compiled" into the chosen representation format, then uploaded to the repository. This is where the deployment process starts. Uploading a new model to the repository shall trigger the deployment of that model. Depending on the type of service the model provides and the number of models deployed, they can be swapped with some downtime, or we can use a standard deployment strategy (Big Bang, Rolling, Blue-Green). Easiest approach would be to introduce some downtime while swapping the served model, or to deploy the new model alongside the old one, then remove the old model.
+
+## Infrastructure
+
+Self-hosted, custom cloud solution or off-the-shelf cloud solution?
+
+Anything can be self-hosted, most if not all components have an open source, free software solution, but usually self-hosting means a lot of overhead throughout the projects lifecycle. Setting up the infrastructure, configuring it, managing and monitoring are very time demanding.
+
+Custom cloud solutions are what AWS, Azure, etc. provides for hosting a VM or containers. These don't require management of hardware, the networking is usually no more than configuration, and managing/scaling/monitoring is well supported.
+
+Using off-the-shelf cloud solutions (like Databricks) come with the benefit of being tailored to a specific task. Most of the infrastructure is managed by these platforms and require the least amount of setup and active management. Components like data storage, model repository, model serving are all set up almost ready to use.
