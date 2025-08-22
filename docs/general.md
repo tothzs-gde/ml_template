@@ -34,7 +34,7 @@
 
 Most of the tasks needs to run without human intervention.
 
-## External System Interfaces
+## Public System Interfaces
 
 1. **Data ingress**: There can be several external data sources. These are either going to be direct access to the database or APIs. Receiving direct read-only access would require the least amount of work on the database owner's side, but an API could also be provided. In the latter case data sanitization could be more reliably achieved, for example in case of sensitive data. I would assume this to be a pull configuration on our end. The external data sources are "done", our system is the new one, therefore most of the development happens on our end.
 
@@ -156,7 +156,7 @@ Cons:
 [Source for the branching strategies above](https://medium.com/@sreekanth.thummala/choosing-the-right-git-branching-strategy-a-comparative-analysis-f5e635443423)
 
 
-### Contribution guide
+### Code contribution
 
 ### Folder structure
 
