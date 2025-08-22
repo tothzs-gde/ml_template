@@ -77,3 +77,7 @@ Anything can be self-hosted, most if not all components have an open source, fre
 Custom cloud solutions are what AWS, Azure, etc. provides for hosting a VM or containers. These don't require management of hardware, the networking is usually no more than configuration, and managing/scaling/monitoring is well supported.
 
 Using off-the-shelf cloud solutions (like Databricks) come with the benefit of being tailored to a specific task. Most of the infrastructure is managed by these platforms and require the least amount of setup and active management. Components like data storage, model repository, model serving are all set up almost ready to use.
+
+## Service monitoring
+
+In this section the focus is on service availability, health, traffic, throughput, scaling and other regular DevOps, non-ML questions. The route we take is tightly connected to the infrastructure. The only thing most likely everyone can agree on is that developing a custom solution here is out-of-scope. Either use an open source solution like Grafana, or use whatever the chosen cloud platform provides/prefers. Monitoring and alerting are usually built in to cloud platforms.
