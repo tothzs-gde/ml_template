@@ -1,0 +1,67 @@
+# General
+
+*Philosophy: consistency and automation*
+
+## Machine Learning Components
+
+- Data ingress (ETL / ELT / ETLT pipeline)
+
+- Data quality monitoring
+
+- Model training
+
+- Model evaluation (after training)
+
+- Model deployment
+
+- Model serving
+
+- Data egress
+
+- Model performance degradation monitoring
+
+- Model registry
+
+- Service monitoring
+
+- Data security and governance
+
+- Experiment tracking
+
+- Code version control
+
+Most of the tasks needs to run without human intervention.
+
+## External System Interfaces
+
+1. **Data ingress**: There can be several external data sources. These are either going to be direct access to the database or APIs. Receiving direct read-only access would require the least amount of work on the database owner's side, but an API could also be provided. In the latter case data sanitization could be more reliably achieved, for example in case of sensitive data. I would assume this to be a pull configuration on our end. The external data sources are "done", our system is the new one, therefore most of the development happens on our end.
+
+2. **Data egress**: We are developing a backend service, so there is no user facing interface. The outputs of our models needs an access points for other services which desire to use them. The situation seems to be reversed compared to data ingress. We could either give direct read-only access to our data, provide an API through which external services could poll them, or we could write to an external database / call an external API to the services depending on us.
+
+3. **Model serving**: Certain tasks could arise which would require us to directly expose our models. I am aware at the moment whether there will be a need for this interface or not.
+
+## Model Representation
+
+In the name of consistency we can choose between three strategies.
+
+1. Standard model format
+
+2. Native model format
+
+3. Custom model format
+
+The first option is to choose and use a industry standard model representation format, for example ONNX. Using a standard format would mean that after training the model, we would need to insert a compilation step into the process. This could either be a simple function call converting only the model, or compiling the data preprocessing/transformation pipeline with the model. Technically this is not too much of an overhead. Libraries exist to do this conversion, so it should be no more than a couple lines of code.
+
+The second option would be to keep all models in their original "native" format. This would mean that the stored sklearn models would differ for example from tensorflow models. This would mean that anytime we might use these models, we would need to use different interfaces they provide. I am not yet sure if it would affect a model serving service or not. If we are writing our own model serving service, then it deffinitly would be extra overhead to handle the differences.
+
+The third option is to create our own representation format. In theory it would provide the most flexibility/customizability, but would need the most time to develop and test it. If we build our own model serving service, then it wouldn't be an issue, but we might encounter some issues when using other platforms.
+
+The most important part of choosig the representation is to have all models provide the same interface, therefore they could be swapped in-and-out on the serving side without need to adjust any other component of the system. 
+
+## Model repository
+
+To store the models, we could use some generic cloud storage combined with DVC for example or use a something like Unity Catalog provided by Databrics, wich can also be configured to use a cloud storage. It is probably the best to choose the model repository after we pinned down the model serving solution. External model serving services most likely have a preferred repository wich would be the easiest to integrate.
+
+## Model deployment
+
+Here the name of the game is automation, but the solution is highly dependent on the model serving just like the model repository is. Model training might be triggered either manually or by some automation. The trained models are 
