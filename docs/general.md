@@ -8,6 +8,10 @@
 
 - Data quality monitoring
 
+- Data egress
+
+- Data security and governance
+
 - Model training
 
 - Model evaluation (after training)
@@ -16,15 +20,11 @@
 
 - Model serving
 
-- Data egress
-
 - Model performance degradation monitoring
 
 - Model registry
 
 - Service monitoring
-
-- Data security and governance
 
 - Experiment tracking
 
