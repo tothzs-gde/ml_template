@@ -81,3 +81,128 @@ Using off-the-shelf cloud solutions (like Databricks) come with the benefit of b
 ## Service monitoring
 
 In this section the focus is on service availability, health, traffic, throughput, scaling and other regular DevOps, non-ML questions. The route we take is tightly connected to the infrastructure. The only thing most likely everyone can agree on is that developing a custom solution here is out-of-scope. Either use an open source solution like Grafana, or use whatever the chosen cloud platform provides/prefers. Monitoring and alerting are usually built in to cloud platforms.
+
+## Code Version Control
+
+It is git. Here the question is not what do we use, but how do we use it. The three main parts we need to define are:
+
+ - branching strategy
+ - code contribution
+ - folder structure
+
+### Branching Strategy
+
+#### Trunk Based Development:
+Trunk Based Development promotes a single shared branch called “trunk” and eliminates long-living branches. There are two variations based on team size: smaller teams commit directly to the trunk, while larger teams create short-lived feature branches. Frequent integration of smaller feature slices is encouraged to ensure regular merging.
+
+Pros:
+- Encourages DevOps and unit testing best practices.
+- Enhances collaboration and reduces merge conflicts.
+- Allows for quick releases.
+
+Cons:
+- Requires an experienced team that can slice features appropriately for regular integration.
+- Relies on strong CI/CD practices to maintain stability.
+
+![alt text](assets/trunkbased.webp)
+
+#### Git-Flow:
+
+Git-Flow is a comprehensive branching strategy that aims to cover various scenarios. It defines specific branch responsibilities, such as main/master for production, develop for active development, feature for new features, release as a gatekeeper to production, and hotfix for addressing urgent issues. The life-cycle involves branching off from develop, integrating features, creating release branches for testing, merging into main/master, and tagging versions.
+
+Pros:
+- Well-suited for large teams and aligning work across multiple teams.
+- Effective handling of multiple product versions.
+- Clear responsibilities for each branch.
+- Allows for easy navigation of production versions through tags.
+
+Cons:
+- Complexity due to numerous branches, potentially leading to merge conflicts.
+- Development and release frequency may be slower due to multi-step process.
+- Requires team consensus and commitment to adhere to the strategy.
+
+![alt text](assets/gitflow.webp)
+
+#### GitHub-Flow:
+GitHub-Flow simplifies Git-Flow by eliminating release branches. It revolves around one active development branch (often main or master) that is directly deployed to production. Features and bug fixes are implemented using long-living feature branches. Feedback loops and asynchronous collaboration, common in open-source projects, are encouraged.
+
+Pros:
+- Faster feedback cycles and shorter production cycles.
+- Ideal for asynchronous work in smaller teams.
+- Agile and easier to comprehend compared to Git-Flow.
+
+Cons:
+- Merging a feature branch implies it is production-ready, potentially introducing bugs without proper testing and a robust CI/CD process.
+- Long-living branches can complicate the process.
+- Challenging to scale for larger teams due to increased merge conflicts.
+- Supporting multiple release versions concurrently is difficult.
+
+![alt text](assets/githubflow.webp)
+
+#### GitLab-Flow:
+GitLab-Flow strikes a balance between Git-Flow and GitHub-Flow. It adopts GitHub-Flow’s simplicity while introducing additional branches representing staging environments before production. The main branch still represents the production environment.
+
+Pros:
+- Can handle multiple release versions or stages effectively.
+- Simpler than Git-Flow.
+- Focuses on quality with a lean approach.
+
+Cons:
+- Complexity increases when maintaining multiple versions.
+- More intricate compared to GitHub-Flow.
+
+![alt text](assets/gitlabflow.webp)
+
+[Source for the branching strategies above](https://medium.com/@sreekanth.thummala/choosing-the-right-git-branching-strategy-a-comparative-analysis-f5e635443423)
+
+
+### Contribution guide
+
+### Folder structure
+
+```
+ml_project/
+├── data/
+│   ├── raw/               # Raw data (input)
+│   ├── processed/         # Processed/cleaned data
+│   ├── external/          # External datasets (optional)
+│   └── README.md          # Description of the data structure
+├── notebooks/
+│   ├── exploratory.ipynb   # Exploratory Data Analysis (EDA)
+│   ├── modeling.ipynb     # Experimentation and modeling
+│   └── README.md          # Guidelines for notebooks
+├── src/
+│   ├── __init__.py        # Package initialization
+│   ├── data/              # Data loading/processing scripts
+│   │   ├── __init__.py
+│   │   └── preprocess.py
+│   ├── models/            # Model training and evaluation scripts
+│   │   ├── __init__.py
+│   │   └── train.py
+│   ├── utils/             # Utility functions
+│   │   ├── __init__.py
+│   │   └── helpers.py
+│   └── README.md          # Description of the `src` folder
+├── tests/
+│   ├── test_data.py       # Unit tests for data processing
+│   ├── test_models.py     # Unit tests for models
+│   └── README.md          # Description of the `tests` folder
+├── models/
+│   ├── saved/             # Serialized models
+│   ├── artifacts/         # Training artifacts (e.g., logs, configs)
+│   └── README.md          # Model storage guidelines
+├── reports/
+│   ├── figures/           # Visualizations and plots
+│   └── README.md          # Description of reports
+├── configs/
+│   ├── config.yaml        # General configuration file
+│   ├── train.yaml         # Training-specific configurations
+│   └── README.md          # Description of config files
+├── .gitlab-ci.yml         # GitLab CI/CD pipeline configuration
+├── requirements.txt       # Python dependencies
+├── environment.yml        # Conda environment (optional)
+├── setup.py               # For packaging the project as a module
+├── README.md              # High-level project description
+├── LICENSE                # License for the project
+└── .gitignore             # Files to ignore in Git
+```
