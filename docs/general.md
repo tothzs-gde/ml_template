@@ -64,4 +64,4 @@ To store the models, we could use some generic cloud storage combined with DVC f
 
 ## Model deployment
 
-Here the name of the game is automation, but the solution is highly dependent on the model serving just like the model repository is. Model training might be triggered either manually or by some automation. The trained models are 
+Here the name of the game is automation, but the solution is highly dependent on the model serving just like the model repository is. Model training might be triggered either manually or by some automation. The trained models are "compiled" into the chosen representation format, then uploaded to the repository. This is where the deployment process starts. Uploading a new model to the repository shall trigger the deployment of that model. Depending on the type of service the model provides and the number of models deployed, they can be swapped with some downtime, or we can use a standard deployment strategy (Big Bang, Rolling, Blue-Green). Easiest approach would be to introduce some downtime while swapping the served model, or to deploy the new model alongside the old one, then remove the old model.
