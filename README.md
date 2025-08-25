@@ -1,14 +1,29 @@
 # ML Template
 
-## Folder structure
+## How to run locally
 
-data/ - Version controlled datasets. No actual data is to be pushed here.
+```
+python -m venv venv
+source venv/bin/activate
+pip install requirements.txt
+podman-compose up -d
+fastapi dev src/main.py
+```
 
-model/ - Trained models
+### Services
 
-scripts/ - Pipeline scripts. Data ingestion, data export, cleaning, transformation, validation, etc.
+1. MiniO bucket (model storage)
 
-templates/ - Code and notebook templates. Boilerplate files for starting a new experiment or script.
+username: minioadmin
 
-notebooks/ - Notebooks and whatever else. No production code. Use imports from the scripts/ folder.
+password: minioadmin
 
+URL: http://127.0.0.1:9001/
+
+2. MLflow frontend
+
+URL: http://127.0.0.1:8080/
+
+3. App swagger
+
+URL: http://127.0.0.1:8000/docs
