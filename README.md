@@ -8,6 +8,8 @@ source venv/bin/activate
 pip install requirements.txt
 podman-compose up -d
 fastapi dev src/main.py
+
+# Test through the swagger
 ```
 
 ### Services
