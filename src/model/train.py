@@ -8,12 +8,14 @@ from src.data.pipeline import pipe
 
 
 def train():
-    df = pd.read_csv("data/titanic.csv", index_col="PassengerId")
+    df = pd.read_csv("../data/titanic.csv", index_col="PassengerId")
     df = pipe.process(df)
 
     x = df.drop(columns="Survived")
     y = df["Survived"]
 
+    # This gotta be packaged with the models at train time or even better if
+    # it is part of the data preprocessing pipeline
     scaler = MinMaxScaler()
     x = scaler.fit_transform(x)
 
@@ -40,10 +42,7 @@ def train():
             name="titanic_model",
             signature=signature,
             input_example=x,
-            registered_model_name="titanic_model",
-        )
-        mlflow.set_logged_model_tags(
-            model_info.model_id, {"Training Info": "Basic LR model for Titanic dataset"}
+            registered_model_name="sklearn-logreg-model",
         )
 
     return score
