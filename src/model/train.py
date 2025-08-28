@@ -8,8 +8,8 @@ from src.data.pipeline import pipe
 
 
 def train():
-    df = pd.read_csv("../data/titanic.csv", index_col="PassengerId")
-    df = pipe.process(df)
+    df = pd.read_csv("data/titanic.csv", index_col="PassengerId")
+    df = pipe(df)
 
     x = df.drop(columns="Survived")
     y = df["Survived"]
