@@ -2,10 +2,9 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # Remove
-    features_to_use: list[str] =[]
-
-    # Good
+    '''
+    '''
+    
     dataset: str
     dataset_test: str
 
