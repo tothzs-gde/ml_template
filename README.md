@@ -1,31 +1,64 @@
 # ML Template
 
-## How to run locally
+[General, short description]
+
+## How to run the notebooks
+
+1. Create a virtual environment
 
 ```
+# Go to the projects root folder
+
+# Create new environment
 python -m venv venv
-source venv/bin/activate
-pip install requirements.txt
-podman-compose up -d
-fastapi dev src/main.py
 
-# Test through the swagger
+# Activate the new environment
+source venv/bin/activate
+
+# Install dependencies
+pip install nb_requirements.txt
 ```
 
-### Services
+2. Choose the venv for the notebook environment
 
-1. MiniO bucket (model storage)
+3. Run the notbooks
 
+## How to deploy the app
+
+Currantly the deployment is only supported through docker-compose / podman-compose.
+
+```
+podman-compose up -d
+```
+
+## Deployed Services
+
+**App swagger**
+
+Frontend: http://localhost:8000/docs
+
+**MLflow**
+
+Experiment tracking service.
+
+Frontend: http://localhost:8080/
+
+**PostgreSQL**
+
+Database used by MLflow.
+
+**MiniO bucket** (model storage)
+
+S3 cloud storage emulating service. Used to store artifacts such as trained models.
+
+Frontend: http://localhost:9001/
+
+Default credentials:
+```
 username: minioadmin
-
 password: minioadmin
+```
 
-URL: http://127.0.0.1:9001/
+## Project Structure
 
-2. MLflow frontend
-
-URL: http://127.0.0.1:8080/
-
-3. App swagger
-
-URL: http://127.0.0.1:8000/docs
+## Env vars
