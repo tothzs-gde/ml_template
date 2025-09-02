@@ -12,10 +12,11 @@ class Settings(BaseSettings):
     mlflow_experiment_name: str
     mlflow_model_name: str
     mlflow_registered_model_name: str
+    mlflow_s3_endpoint_url: str
 
     minio_url: str
-    minio_access_key: str
-    minio_secret_key: str
+    aws_access_key_id: str
+    aws_secret_access_key: str
     minio_bucket_name: str
 
     class Config:

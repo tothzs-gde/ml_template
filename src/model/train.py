@@ -1,6 +1,3 @@
-import logging
-import sys
-
 import mlflow
 from mlflow.models import infer_signature
 from sklearn.discriminant_analysis import StandardScaler
@@ -10,22 +7,23 @@ from sklearn.preprocessing import MinMaxScaler
 
 from src.data.datasource import from_local_csv
 from src.data.pipeline import get_pipeline
+from src.utils.logging import logger
 from src.utils.settings import settings
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-stream_handler = logging.StreamHandler(sys.stdout)
-log_formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-stream_handler.setFormatter(log_formatter)
-logger.addHandler(stream_handler)
-
-logger.info('API is starting up')
 
 
 def train():
     ''' 
     '''
+
+    # TEST GRID
+    # param_grid = {
+    #     'data_pipe__preprocessor__num__imputer__strategy': ['mean'],
+    #     'data_pipe__preprocessor__num__scaler': [MinMaxScaler()],
+    #     'data_pipe__preprocessor__cat__imputer__strategy': ['mean'],
+    #     'data_pipe__feature_selector__k': [1],
+    #     'classifier__C': [1],
+    #     'classifier__solver': ['lbfgs'],
+    # }
 
     param_grid = {
         'data_pipe__preprocessor__num__imputer__strategy': ['mean', 'median', 'most_frequent', 'constant'],
@@ -55,8 +53,8 @@ def train():
     test_accuracy = best_model.score(x_test, y_test)
 
     logger.info('mlflow tracking')
-    mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-    mlflow.set_experiment("Titanic PoC")
+    mlflow.set_tracking_uri(uri=settings.mlflow_tracking_url)
+    mlflow.set_experiment(experiment_name=settings.mlflow_experiment_name)
 
     with mlflow.start_run():
         mlflow.log_params(best_model.get_params())

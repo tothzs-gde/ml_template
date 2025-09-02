@@ -1,6 +1,17 @@
 version: "3.8"
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    env_file:
+      - ./app.env
+    container_name: ml_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mlflow
   mlflow:
     build:
       context: .
@@ -14,11 +25,8 @@ services:
       --port 8080
       --default-artifact-root s3://mlflow/
       --backend-store-uri postgresql://mlflow_user:password@postgres:5432/mlflow_db
-    environment:
-      - MLFLOW_TRACKING_URI=postgresql://mlflow_user:password@postgres:5432/mlflow_db
-      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
-      - AWS_ACCESS_KEY_ID=minioadmin
-      - AWS_SECRET_ACCESS_KEY=minioadmin
+    env_file:
+      - ./app.env
     depends_on:
       - postgres
       - minio
