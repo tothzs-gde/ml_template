@@ -54,6 +54,7 @@ S3 cloud storage emulating service. Used to store artifacts such as trained mode
 Frontend: http://localhost:9001/
 
 Default credentials:
+
 ```
 username: minioadmin
 password: minioadmin
@@ -61,4 +62,37 @@ password: minioadmin
 
 ## Project Structure
 
-## Env vars
+```
+.
+├── app.Dockerfile              # Docker image of the src/ application
+├── app.env                     # Env vars used by the application at runtime
+├── app_requirements.txt
+├── data
+│   ├── titanic.csv             # Training data
+│   └── titanic_test.csv        # Evaluation data
+├── docker-compose.yml
+├── mlflow-boto3.Dockerfile     # Custom image to enable MLflow to use MiniO as cloud storage
+├── nb_requirements.txt         # Dependencies of the notebooks
+├── notebooks
+│   ├── EDA.ipynb               # Exploratory Data Analysis
+│   └── Training Example.ipynb  # PoC training and evaluation of the model
+├── README.md
+├── src
+│   ├── main.py
+│   ├── api
+│   │   └── api.py              # API endpoint definitions
+│   ├── data
+│   │   ├── datasource.py       # Local/remote reader functions
+│   │   └── pipeline.py         # Data processing pipeline definition
+│   ├── model
+│   │   ├── evaluate.py         # Evaluation function
+│   │   ├── inference.py        # Inference function
+│   │   └── train.py            # Training function
+│   └── utils
+│       ├── logging.py
+│       └── settings.py
+└── tests
+    └── test_main.py
+```
+
+## Configuration (env vars)
