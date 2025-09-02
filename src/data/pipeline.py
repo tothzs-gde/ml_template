@@ -7,9 +7,16 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 
-def get_pipeline():
+def get_pipeline() -> Pipeline:
+    ''' This function creates a data processing pipeline to preprocess the input
+    data and classify it. It uses imputation to to fill in the missing values,
+    scaling on numeric features, and encoding on categorical features. Logistic
+    Regression is used for the classifier model.
+
+    Returns:
+        Pipeline: Assembled data preprocessing pipeline and classifier model
     '''
-    '''
+
     numeric_features: list[str] = ['Age', 'SibSp', 'Parch', 'Fare']
     categorical_features: list[str] = ['Pclass', 'Sex', 'Embarked']
 

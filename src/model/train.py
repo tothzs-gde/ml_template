@@ -34,13 +34,13 @@ def train():
         'classifier__solver': ['lbfgs', 'liblinear', 'sag', 'saga'],
     }
 
-    logger.info('importing train data')
-    x_train, y_train = from_local_csv('data/titanic.csv')
+    logger.info('Importing training data')
+    x_train, y_train = from_local_csv(path='data/titanic.csv')
 
-    logger.info('assembling pipeline')
+    logger.info('Assembling pipeline')
     pipeline = get_pipeline()
 
-    logger.info('fitting model')
+    logger.info('Training model')
     skf = StratifiedKFold(n_splits=5, shuffle=True)
     grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring="accuracy", cv=skf, verbose=1)
     grid_search.fit(x_train, y_train)
@@ -48,11 +48,11 @@ def train():
     best_model = grid_search.best_estimator_
     training_accuracy = grid_search.best_score_
 
-    logger.info('evaluating model')
-    x_test, y_test = from_local_csv('data/titanic_test.csv')
+    logger.info('Evaluating model')
+    x_test, y_test = from_local_csv(path='data/titanic_test.csv')
     test_accuracy = best_model.score(x_test, y_test)
 
-    logger.info('mlflow tracking')
+    logger.info('Starting MLflow tracking')
     mlflow.set_tracking_uri(uri=settings.mlflow_tracking_url)
     mlflow.set_experiment(experiment_name=settings.mlflow_experiment_name)
 
@@ -61,10 +61,9 @@ def train():
         mlflow.log_metric("training_accuracy", training_accuracy)
         mlflow.log_metric("test_accuracy", test_accuracy)
 
-        logger.info('infering sign')
         signature = infer_signature(x_train, best_model.predict(x_train))
 
-        logger.info('logging model')
+        logger.info('Logging model')
         model_info = mlflow.sklearn.log_model(
             sk_model=best_model,
             name=settings.mlflow_model_name,

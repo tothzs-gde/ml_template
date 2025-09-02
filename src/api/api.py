@@ -11,8 +11,11 @@ router = APIRouter()
 @router.post("/train")
 async def api_train():
     print("Calling TRAIN endpoint.")
-    score = train()
-    return {"status": "success", "score": score}
+    try:
+        train()
+        return {"status": "success"}
+    except Exception as e:
+        return {"status": "failed"}
 
 
 # @router.post("/inference")

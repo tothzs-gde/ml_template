@@ -1,10 +1,10 @@
-import logging
+import logging as _logging
 import sys
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-stream_handler = logging.StreamHandler(sys.stdout)
-log_formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-stream_handler.setFormatter(log_formatter)
-logger.addHandler(stream_handler)
+logger = _logging.getLogger(__name__)
+logger.setLevel(_logging.DEBUG)
+_stream_handler = _logging.StreamHandler(sys.stdout)
+_log_formatter = _logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+_stream_handler.setFormatter(_log_formatter)
+logger.addHandler(_stream_handler)
