@@ -19,9 +19,9 @@ def from_local_csv(path: str) -> tuple[pd.DataFrame]:
     features_to_use = ['Survived', 'Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']
     df = pd.read_csv(path, index_col='PassengerId')
     df = df[features_to_use]
-    x = df.drop(columns='Survived')
+    X = df.drop(columns='Survived')
     y = df['Survived']
 
     logger.info(f'Imported dataset {df.shape}')
 
-    return x, y
+    return X, y

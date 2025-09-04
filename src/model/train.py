@@ -16,23 +16,23 @@ def train():
     '''
 
     # TEST GRID
-    # param_grid = {
-    #     'data_pipe__preprocessor__num__imputer__strategy': ['mean'],
-    #     'data_pipe__preprocessor__num__scaler': [MinMaxScaler()],
-    #     'data_pipe__preprocessor__cat__imputer__strategy': ['mean'],
-    #     'data_pipe__feature_selector__k': [1],
-    #     'classifier__C': [1],
-    #     'classifier__solver': ['lbfgs'],
-    # }
-
     param_grid = {
-        'data_pipe__preprocessor__num__imputer__strategy': ['mean', 'median', 'most_frequent', 'constant'],
-        'data_pipe__preprocessor__num__scaler': [MinMaxScaler(), StandardScaler()],
-        'data_pipe__preprocessor__cat__imputer__strategy': ['mean', 'median', 'most_frequent', 'constant'],
-        'data_pipe__feature_selector__k': list(range(1, 8)),
-        'classifier__C': [0.1, 1, 10],
-        'classifier__solver': ['lbfgs', 'liblinear', 'sag', 'saga'],
+        'data_pipe__preprocessor__num__imputer__strategy': ['mean'],
+        'data_pipe__preprocessor__num__scaler': [MinMaxScaler()],
+        'data_pipe__preprocessor__cat__imputer__strategy': ['mean'],
+        'data_pipe__feature_selector__k': [1],
+        'classifier__C': [1],
+        'classifier__solver': ['lbfgs'],
     }
+
+    # param_grid = {
+    #     'data_pipe__preprocessor__num__imputer__strategy': ['mean', 'median', 'most_frequent', 'constant'],
+    #     'data_pipe__preprocessor__num__scaler': [MinMaxScaler(), StandardScaler()],
+    #     'data_pipe__preprocessor__cat__imputer__strategy': ['mean', 'median', 'most_frequent', 'constant'],
+    #     'data_pipe__feature_selector__k': list(range(1, 8)),
+    #     'classifier__C': [0.1, 1, 10],
+    #     'classifier__solver': ['lbfgs', 'liblinear', 'sag', 'saga'],
+    # }
 
     logger.info('Importing training data')
     x_train, y_train = from_local_csv(path='data/titanic.csv')
@@ -49,8 +49,8 @@ def train():
     training_accuracy = grid_search.best_score_
 
     logger.info('Evaluating model')
-    x_test, y_test = from_local_csv(path='data/titanic_test.csv')
-    test_accuracy = best_model.score(x_test, y_test)
+    X_test, y_test = from_local_csv(path='data/titanic_test.csv')
+    test_accuracy = best_model.score(X_test, y_test)
 
     logger.info('Starting MLflow tracking')
     mlflow.set_tracking_uri(uri=settings.mlflow_tracking_url)

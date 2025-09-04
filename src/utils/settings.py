@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     minio_bucket_name: str
 
     class Config:
-        env_file = "python.env"
+        env_file = "app.env"
 
 
 settings = Settings()
