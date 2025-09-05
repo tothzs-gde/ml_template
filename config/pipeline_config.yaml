@@ -42,23 +42,19 @@ pipeline:
 
 search_parameters:
   # LogisticRegression
-  # - data_pipe__preprocessor__num__imputer__strategy: ['mean', 'median']
-  #   data_pipe__preprocessor__num__scaler:
-  #     - null
-  #     - class: sklearn.preprocessing.StandardScaler
-  #     - class: sklearn.preprocessing.MinMaxScaler
-  #   data_pipe__preprocessor__cat__imputer__strategy: ['most_frequent', 'median']
-  #   data_pipe__feature_selector__k: [1, 2, 3, 4, 5, 6, 7]
-  #   classifier:
-  #     - class: sklearn.linear_model.LogisticRegression
-  #   classifier__C: [0.1, 1, 10]
-  #   classifier__solver: ['lbfgs', 'liblinear', 'sag', 'saga']
-  # RandomForest
   - data_pipe__preprocessor__num__imputer__strategy: ['mean', 'median']
     data_pipe__preprocessor__num__scaler:
       - null
       - class: sklearn.preprocessing.StandardScaler
       - class: sklearn.preprocessing.MinMaxScaler
+    data_pipe__preprocessor__cat__imputer__strategy: ['most_frequent', 'median']
+    data_pipe__feature_selector__k: [1, 2, 3, 4, 5, 6, 7]
+    classifier:
+      - class: sklearn.linear_model.LogisticRegression
+    classifier__C: [0.1, 1, 10]
+    classifier__solver: ['lbfgs', 'liblinear', 'sag', 'saga']
+  # RandomForest
+  - data_pipe__preprocessor__num__imputer__strategy: ['mean', 'median']
     data_pipe__preprocessor__cat__imputer__strategy: ['most_frequent', 'median']
     data_pipe__feature_selector__k: [1, 2, 3, 4, 5, 6, 7]
     classifier:

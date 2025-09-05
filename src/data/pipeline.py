@@ -1,51 +1,68 @@
-from sklearn.compose import ColumnTransformer
-from sklearn.discriminant_analysis import StandardScaler
-from sklearn.feature_selection import SelectKBest
-from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
+import yaml
+import importlib
+from typing import Any
+from typing import Type
 
 
-def get_pipeline() -> Pipeline:
-    ''' This function creates a data processing pipeline to preprocess the input
-    data and classify it. It uses imputation to to fill in the missing values,
-    scaling on numeric features, and encoding on categorical features. Logistic
-    Regression is used for the classifier model.
-
-    Returns:
-        Pipeline: Assembled data preprocessing pipeline and classifier model
-    '''
-
-    numeric_features: list[str] = ['Age', 'SibSp', 'Parch', 'Fare']
-    categorical_features: list[str] = ['Pclass', 'Sex', 'Embarked']
+def _import_class(class_path: str) -> Type:
+    module_name, class_name = class_path.rsplit(".", 1)
+    module = importlib.import_module(module_name)
+    return getattr(module, class_name)
 
 
-    numeric_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='most_frequent')),
-        ('scaler', StandardScaler()),
-    ])
+def _instantiate_component(component_config: dict[str, Any]) -> Any:
+    cls = _import_class(component_config["class"])
+    params = component_config.get("params", {})
 
-    categorical_transformer = Pipeline(steps=[
-        ('encoder', OneHotEncoder()),
-        ('imputer', SimpleImputer(strategy='most_frequent')),
-    ])
+    for key, val in params.items():
+        if isinstance(val, list) and key == "steps":
+            new_steps = []
+            for step_cfg in val:
+                step_name = step_cfg["name"]
+                step_obj = _instantiate_component(step_cfg)
+                new_steps.append((step_name, step_obj))
+            params[key] = new_steps
 
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', numeric_transformer, numeric_features),
-            ('cat', categorical_transformer, categorical_features)
-        ])
-    feature_selector = SelectKBest(k='all')
+        elif isinstance(val, list) and key == "transformers":
+            new_transformers = []
+            for transformer_cfg in val:
+                transformer_name = transformer_cfg["name"]
+                transformer_obj = _instantiate_component(transformer_cfg)
+                transformer_columns = transformer_cfg["columns"]
+                new_transformers.append(
+                    (transformer_name, transformer_obj, transformer_columns)
+                )
+            params[key] = new_transformers
 
-    data_pipe = Pipeline(steps=[
-        ('preprocessor', preprocessor),
-        ('feature_selector', feature_selector),
-    ])
+        elif isinstance(val, dict) and "class" in val:
+            params[key] = _instantiate_component(val)
 
-    pipeline = Pipeline(steps=[
-        ('data_pipe', data_pipe),
-        ('classifier', LogisticRegression(C=1, solver="lbfgs", max_iter=1000))
-    ])
+    return cls(**params)
 
-    return pipeline
+
+def load_config(path: str) -> dict[str, Any]:
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
+
+
+def load_pipeline(pipeline_config: dict[str, Any]):
+    return _instantiate_component(pipeline_config)
+
+
+def load_search_params(search_params_config: dict[str, Any]):
+    search_params = []
+    for param_dict in search_params_config:
+        new_param_dict = {}
+        for key, val in param_dict.items():
+            if isinstance(val, list):
+                new_list = []
+                for item in val:
+                    if isinstance(item, dict) and "class" in item:
+                        new_list.append(_instantiate_component(item))
+                    else:
+                        new_list.append(item)
+                new_param_dict[key] = new_list
+            else:
+                new_param_dict[key] = val
+        search_params.append(new_param_dict)
+    return search_params
