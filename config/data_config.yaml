@@ -1,0 +1,12 @@
+categorical_features:
+- Pclass
+- Sex
+- Embarked
+index_columns:
+- PassengerId
+numerical_features:
+- Age
+- SibSp
+- Parch
+- Fare
+target_column: Survived
