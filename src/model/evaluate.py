@@ -1,30 +1,54 @@
-# import mlflow
-# import pandas as pd
-# from sklearn.metrics import accuracy_score
-# from sklearn.preprocessing import MinMaxScaler
+import datetime
 
-# from src.data.pipeline import pipe
+import mlflow
+import pandas as pd
+import yaml
+from sklearn.metrics import accuracy_score
+
+from src.utils.logging import logger
+from src.utils.settings import settings
 
 
-# def evaluate():
-#     print("hello")
-#     df = pd.read_csv("data/titanic_test.csv", index_col="PassengerId")
-#     df = pipe(df)
+def evaluate(model_name: str, model_version: str):
+    '''
+    '''
+    mlflow.set_tracking_uri(uri=settings.mlflow_tracking_url)
+    mlflow.set_experiment(experiment_name=settings.mlflow_experiment_name)
+    mlflow.autolog(
+        log_input_examples=True,
+        log_model_signatures=True,
+        log_models=False,
+        log_datasets=True,
+        log_traces=True,
+    )
 
-#     x = df.drop(columns="Survived")
-#     y = df["Survived"]
+    run_name = f"eval_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}"
+    logger.info(f"Evaluating model ({model_name}:{model_version})")
 
-#     # This gotta be packaged with the models at train time or even better if
-#     # it is part of the data preprocessing pipeline
-#     scaler = MinMaxScaler()
-#     x = scaler.fit_transform(x)
+    # Load the data
+    with open('config/data_config.yaml', 'r') as file:
+        metadata = yaml.safe_load(file)
 
-#     model_name = "sklearn-logreg-model"
-#     model_version = "latest"
-#     model_uri = f"models:/{model_name}/{model_version}"
-#     model = mlflow.sklearn.load_model(model_uri)
-#     y_pred = model.predict(x)
+    index_columns = metadata['index_columns']
+    target_column = metadata['target_column']
 
-#     score = accuracy_score(y,y_pred)
+    df_train = pd.read_csv('data/titanic_test.csv', index_col=index_columns)
+    X_test = df_train.drop(columns=target_column)
+    y_test = df_train[target_column]
 
-#     return score
+    # Load model
+    model_name = settings.mlflow_registered_model_name
+    model_version = "latest"
+    model_uri = f"models:/{model_name}/{model_version}"
+    model = mlflow.sklearn.load_model(model_uri)
+
+    # Predict
+    with mlflow.start_run(
+        run_name=run_name,
+        log_system_metrics=True,
+        tags={'test_tag': "hello"}
+    ):
+        y_pred = model.predict(X_test)
+        score = accuracy_score(y_test, y_pred)
+
+    return score

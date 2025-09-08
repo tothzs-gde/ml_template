@@ -12,6 +12,13 @@ def train(model_name: str, model_version: str):
     '''
     mlflow.set_tracking_uri(uri=settings.mlflow_tracking_url)
     mlflow.set_experiment(experiment_name=settings.mlflow_experiment_name)
+    mlflow.autolog(
+        log_input_examples=True,
+        log_model_signatures=True,
+        log_models=False,
+        log_datasets=True,
+        log_traces=True,
+    )
     
     run_name = f"train_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}"
     logger.info(f"Start to train a new model ({model_name}) under {run_name=}")
@@ -36,13 +43,6 @@ def train(model_name: str, model_version: str):
 
 
     # Train model
-    mlflow.autolog(
-        log_input_examples=True,
-        log_model_signatures=True,
-        log_models=False,
-        log_datasets=True,
-        log_traces=True,
-    )
     with mlflow.start_run(
         run_name=run_name,
         log_system_metrics=True,
