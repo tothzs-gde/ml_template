@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import os
 
 from fastapi import FastAPI
 from minio import Minio
@@ -36,3 +37,14 @@ app = FastAPI(
 
 
 app.include_router(router)
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+
+    os.environ["AWS_ACCESS_KEY_ID"] = settings.aws_access_key_id
+    os.environ["AWS_SECRET_ACCESS_KEY"] = settings.aws_secret_access_key
+    os.environ["MLFLOW_S3_ENDPOINT_URL"] = f"http://{settings.minio_url}"
+
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
