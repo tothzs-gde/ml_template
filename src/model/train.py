@@ -1,73 +1,58 @@
-import mlflow
-from mlflow.models import infer_signature
-from sklearn.discriminant_analysis import StandardScaler
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import StratifiedKFold
-from sklearn.preprocessing import MinMaxScaler
+import datetime
 
-from src.data.datasource import from_local_csv
-from src.data.pipeline import get_pipeline
+import mlflow
+import pandas as pd
+import yaml
 from src.utils.logging import logger
 from src.utils.settings import settings
 
 
-def train():
+def train(model_name: str, model_version: str):
     ''' 
     '''
-
-    # TEST GRID
-    param_grid = {
-        'data_pipe__preprocessor__num__imputer__strategy': ['mean'],
-        'data_pipe__preprocessor__num__scaler': [MinMaxScaler()],
-        'data_pipe__preprocessor__cat__imputer__strategy': ['mean'],
-        'data_pipe__feature_selector__k': [1],
-        'classifier__C': [1],
-        'classifier__solver': ['lbfgs'],
-    }
-
-    # param_grid = {
-    #     'data_pipe__preprocessor__num__imputer__strategy': ['mean', 'median', 'most_frequent', 'constant'],
-    #     'data_pipe__preprocessor__num__scaler': [MinMaxScaler(), StandardScaler()],
-    #     'data_pipe__preprocessor__cat__imputer__strategy': ['mean', 'median', 'most_frequent', 'constant'],
-    #     'data_pipe__feature_selector__k': list(range(1, 8)),
-    #     'classifier__C': [0.1, 1, 10],
-    #     'classifier__solver': ['lbfgs', 'liblinear', 'sag', 'saga'],
-    # }
-
-    logger.info('Importing training data')
-    x_train, y_train = from_local_csv(path='data/titanic.csv')
-
-    logger.info('Assembling pipeline')
-    pipeline = get_pipeline()
-
-    logger.info('Training model')
-    skf = StratifiedKFold(n_splits=5, shuffle=True)
-    grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring="accuracy", cv=skf, verbose=1)
-    grid_search.fit(x_train, y_train)
-
-    best_model = grid_search.best_estimator_
-    training_accuracy = grid_search.best_score_
-
-    logger.info('Evaluating model')
-    X_test, y_test = from_local_csv(path='data/titanic_test.csv')
-    test_accuracy = best_model.score(X_test, y_test)
-
-    logger.info('Starting MLflow tracking')
     mlflow.set_tracking_uri(uri=settings.mlflow_tracking_url)
     mlflow.set_experiment(experiment_name=settings.mlflow_experiment_name)
+    
+    run_name = f"train_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}"
+    logger.info(f"Start to train a new model ({model_name}) under {run_name=}")
 
-    with mlflow.start_run():
-        mlflow.log_params(best_model.get_params())
-        mlflow.log_metric("training_accuracy", training_accuracy)
-        mlflow.log_metric("test_accuracy", test_accuracy)
+    # Load the data
+    with open('config/data_config.yaml', 'r') as file:
+        metadata = yaml.safe_load(file)
 
-        signature = infer_signature(x_train, best_model.predict(x_train))
+    index_columns = metadata['index_columns']
+    target_column = metadata['target_column']
 
-        logger.info('Logging model')
+    df_train = pd.read_csv('data/titanic.csv', index_col=index_columns)
+    X_train = df_train.drop(columns=target_column)
+    y_train = df_train[target_column]
+
+
+    # Load model
+    model_name = settings.mlflow_registered_model_name
+    model_version = "latest"
+    model_uri = f"models:/{model_name}/{model_version}"
+    model = mlflow.sklearn.load_model(model_uri)
+
+
+    # Train model
+    mlflow.autolog(
+        log_input_examples=True,
+        log_model_signatures=True,
+        log_models=False,
+        log_datasets=True,
+        log_traces=True,
+    )
+    with mlflow.start_run(
+        run_name=run_name,
+        log_system_metrics=True,
+        tags={'test_tag': "hello"}
+    ):
+        model.fit(X_train, y_train)
         model_info = mlflow.sklearn.log_model(
-            sk_model=best_model,
+            sk_model=model,
             name=settings.mlflow_model_name,
-            signature=signature,
-            input_example=x_train.head(),
+            input_example=X_train.head(),
             registered_model_name=settings.mlflow_registered_model_name,
         )
+    logger.info("Training complete:", model_name)
