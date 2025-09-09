@@ -38,7 +38,7 @@ This endpoint offers two interfaces. The endpoint itself is for the user to manu
 
 MLflow directly doesn't support data drift checking, but we could still log these tests in runs for example under the name of "*drift_{model_name}_{model_version}_{datetime}*" for example to log drift events only. In this case the subject data could be saved also for later analysis?
 
-Later on the output of this endpoint shall be connected to Grafana or similar service to track and alert. Based on specified conditions a new model training could also be triggered.
+Later on the output of this endpoint shall be connected to Grafana or similar service to track and alert. Based on specified conditions a new model training could also be triggered. These conditions and the tracking method need to be identified.
 
 ### GET /health
 
