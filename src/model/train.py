@@ -1,6 +1,7 @@
 import datetime
 
 import mlflow
+from mlflow import MlflowClient
 from sklearn.model_selection import train_test_split
 
 from src.data.datasource import load_from_csv
@@ -50,15 +51,11 @@ def train(model_name: str, model_version: str):
     model_uri = f"models:/{model_name}/{model_version}"
     model = mlflow.sklearn.load_model(model_uri)
 
-    tags = {
-        "drift-data": drift_file_name
-    }
-
     with mlflow.start_run(
         run_name=run_name,
         log_system_metrics=True,
-        tags=tags,
-    ):
+        tags={"drift-data": drift_file_name},
+    ) as active_run:
         model.fit(X_train, y_train)
         model_info = mlflow.sklearn.log_model(
             sk_model=model,
@@ -66,11 +63,35 @@ def train(model_name: str, model_version: str):
             input_example=X_train.head(),
             registered_model_name=settings.mlflow_registered_model_name,
         )
+
+        mlflow_client = MlflowClient()
+        latest_versions = mlflow_client.get_latest_versions(
+            name=settings.mlflow_registered_model_name,
+            stages=["None"]
+        )
+
+        version_info = next(
+            v for v in latest_versions if v.run_id == active_run.info.run_id
+        )
+        
+        # registered model tags
+        mlflow_client.set_model_version_tag(
+            name=settings.mlflow_registered_model_name,
+            version=version_info.version,
+            key="drift-data",
+            value=drift_file_name,
+        )
+        mlflow_client.set_model_version_tag(
+            name=settings.mlflow_registered_model_name,
+            version=version_info.version,
+            key="stage",
+            value="staging",
+        )
         
     logger.info(f"Training completed: {model_name}")
 
     return (
         run_name,
         settings.mlflow_registered_model_name,
-        model_info.registered_model_version
+        model_info.registered_model_version,
     )
