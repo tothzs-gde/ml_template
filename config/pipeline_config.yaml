@@ -60,3 +60,17 @@ search_parameters:
     classifier:
       - class: sklearn.ensemble.RandomForestClassifier
     classifier__max_depth: [5, 10, null]
+
+# USE THESE PARAMS WHEN YOU RUN THE TRAINING NOTEBOOK THE VERY FIRST TIME
+# search_parameters:
+#   # LogisticRegression
+#   - data_pipe__preprocessor__num__imputer__strategy: ['mean', 'median']
+#     data_pipe__preprocessor__num__scaler:
+#       - null
+#       - class: sklearn.preprocessing.StandardScaler
+#     data_pipe__preprocessor__cat__imputer__strategy: ['most_frequent']
+#     data_pipe__feature_selector__k: [1]
+#     classifier:
+#       - class: sklearn.linear_model.LogisticRegression
+#     classifier__C: [0.1]
+#     classifier__solver: ['lbfgs', 'liblinear', 'sag', 'saga']
