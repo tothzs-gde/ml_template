@@ -68,3 +68,9 @@ def train(model_name: str, model_version: str):
         )
         
     logger.info(f"Training completed: {model_name}")
+
+    return (
+        run_name,
+        settings.mlflow_registered_model_name,
+        model_info.registered_model_version
+    )

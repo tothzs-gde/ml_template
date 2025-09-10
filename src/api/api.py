@@ -18,11 +18,16 @@ async def api_train(
 ):
     print("Calling TRAIN endpoint.")
     try:
-        train(
+        run_name, new_model_name, new_model_version = train(
             model_name=model_name,
             model_version=model_version,
         )
-        return {"status": "success"}
+        return {
+            "run_name": run_name,
+            "registered_model_name": new_model_name,
+            "registered_model_version": new_model_version,
+            "status": "success",
+        }
     except Exception as e:
         logger.error(e.with_traceback(e.__traceback__))
         logger.error(traceback.format_exc())
