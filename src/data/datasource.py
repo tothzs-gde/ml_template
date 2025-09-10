@@ -1,9 +1,10 @@
 import pandas as pd
+import yaml
 
 from src.utils.logging import logger
 
 
-def from_local_csv(path: str) -> tuple[pd.DataFrame]:
+def load_from_csv(data_path: str, config_path: str) -> tuple[pd.DataFrame]:
     ''' Imports the .csv file given by the path argument.
 
     Args:
@@ -14,14 +15,18 @@ def from_local_csv(path: str) -> tuple[pd.DataFrame]:
             imported file.
     '''
 
-    logger.info(f'Importing data from local csv: {path}')
+    logger.info(f'Importing data from local csv: {data_path}')
 
-    features_to_use = ['Survived', 'Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']
-    df = pd.read_csv(path, index_col='PassengerId')
-    df = df[features_to_use]
-    X = df.drop(columns='Survived')
-    y = df['Survived']
+    with open(config_path, 'r') as file:
+        metadata = yaml.safe_load(file)
+
+    index_columns = metadata['index_columns']
+    target_column = metadata['target_column']
+
+    df = pd.read_csv(data_path, index_col=index_columns)
+    X_data = df.drop(columns=target_column)
+    y_data = df[target_column]
 
     logger.info(f'Imported dataset {df.shape}')
 
-    return X, y
+    return X_data, y_data
