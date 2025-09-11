@@ -1,5 +1,8 @@
 import traceback
+from typing import Any
+
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 from src.model.train import train
 from src.model.evaluate import evaluate
@@ -9,6 +12,10 @@ from src.utils.settings import settings
 
 
 router = APIRouter()
+
+
+class InferenceRequest(BaseModel):
+    data: list[dict[str, Any]]
 
 
 @router.post("/train")
@@ -36,16 +43,18 @@ async def api_train(
 
 @router.post("/inference")
 async def api_inference(
+    request: InferenceRequest,
     model_name: str = settings.mlflow_registered_model_name,
     model_version: str = "latest",
 ):
     print("Calling INFERENCE endpoint.")
     try:
-        pred = infer(
+        predictions = infer(
+            X_data = request.data,
             model_name=model_name,
             model_version=model_version,
         )
-        return {"status": "success", "prediction": pred}
+        return {"status": "success", "prediction": predictions}
     except Exception as e:
         logger.error(e.with_traceback(e.__traceback__))
         logger.error(traceback.format_exc())

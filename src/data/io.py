@@ -40,7 +40,7 @@ def load_from_csv(data_path: str, config_path: str) -> tuple[pd.DataFrame]:
 
 def export_drift_data(
     X_drift: pd.DataFrame,
-    y_drift: pd.DataFrame = None
+    y_drift: pd.DataFrame = None,
 ) -> str:
     ''' Export the combined input (X_drift) and target (y_drift) data to the 
     MinIO S3 drift bucket. The exported data is saved under a timestamp prefixed
@@ -56,10 +56,10 @@ def export_drift_data(
     
     create_drift_bucket()
 
-    if y_drift:
-        df = pd.concat([X_drift, y_drift], axis=1)
-    else:
+    if y_drift is None:
         df = X_drift
+    else:
+        df = pd.concat([X_drift, y_drift], axis=1)
 
     drift_set_name = uuid7str()  # UUID with timestamp
     filename = f"{drift_set_name}.csv"

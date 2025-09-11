@@ -1,16 +1,17 @@
 import datetime
+from typing import Any
 
 import mlflow
 import pandas as pd
-import yaml
 
 from src.utils.logging import logger
 from src.utils.settings import settings
 
 
-def infer(model_name: str, model_version: str):
+def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
     '''
     '''
+    logger.debug(f"Incoming X_data: {X_data}")
     mlflow.set_tracking_uri(uri=settings.mlflow_tracking_url)
     mlflow.set_experiment(experiment_name=settings.mlflow_experiment_name)
     mlflow.autolog(
@@ -24,16 +25,6 @@ def infer(model_name: str, model_version: str):
     run_name = f"infer_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}"
     logger.info(f"Predicting with model ({model_name}:{model_version})")
 
-    # Load the data
-    with open('config/data_config.yaml', 'r') as file:
-        metadata = yaml.safe_load(file)
-
-    index_columns = metadata['index_columns']
-    target_column = metadata['target_column']
-
-    df_train = pd.read_csv('data/titanic_test.csv', index_col=index_columns)
-    data = df_train.drop(columns=target_column)
-
     # Load model
     model_name = settings.mlflow_registered_model_name
     model_version = "latest"
@@ -41,11 +32,14 @@ def infer(model_name: str, model_version: str):
     model = mlflow.sklearn.load_model(model_uri)
 
     # Predict
+    predictions = []
     with mlflow.start_run(
         run_name=run_name,
         log_system_metrics=True,
         tags={'test_tag': "hello"}
     ):
-        y_pred = model.predict(data[:1])
+        for data_point in X_data:
+            df = pd.DataFrame([data_point])
+            predictions.extend(model.predict(df).tolist())
 
-    return y_pred.tolist()
+    return predictions
