@@ -77,3 +77,20 @@ def export_drift_data(
         )
     
     return drift_set_name
+
+
+def import_drift_data(filename: str) -> pd.DataFrame:
+    ''' 
+    Download a drift dataset from MinIO and return it as a pandas DataFrame.
+    
+    Arguments:
+        filename: Name of the drift set file (e.g. "abc123.csv")
+    
+    Returns:
+        pd.DataFrame with the drift dataset
+    '''
+    with minio_client.get_object(
+        bucket_name=settings.minio_drift_bucket_name,
+        object_name=filename,
+    ) as response:
+        return pd.read_csv(BytesIO(response.read()))
