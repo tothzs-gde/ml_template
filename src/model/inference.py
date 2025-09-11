@@ -35,12 +35,13 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
     tags = model_version_details.tags
     drift_data_file_name = tags.get("drift-data") + '.csv'
     drift_reference_data = import_drift_data(filename=drift_data_file_name)
-    drift_scores = detect_drift(
+    drift_results = detect_drift(
         drift_reference_data,
         pd.DataFrame(X_data),
     )
-    for col, result in drift_scores.items():
-        logger.info(f"{col}: drifted={result['drifted']} (p={result['drift_score']:.4f})")
+    if len(drift_results):
+        for col, result in drift_results.items():
+            logger.info(f"{col}: drifted={result['drifted']} (p={result['drift_score']:.4f})")
 
     # Predict
     predictions = []
@@ -51,5 +52,12 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
         for data_point in X_data:
             df = pd.DataFrame([data_point])
             predictions.extend(model.predict(df).tolist())
+        
+        drifted = False
+        for col, results in drift_results.items():
+            drifted = drifted and results["drifted"]
+            mlflow.log_metric(f"drift_score_{col}", results["drift_score"])
+        
+        mlflow.set_tag(f"data_drifted", str(drifted))
 
     return predictions
