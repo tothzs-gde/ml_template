@@ -15,11 +15,7 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
     mlflow.set_tracking_uri(uri=settings.mlflow_tracking_url)
     mlflow.set_experiment(experiment_name=settings.mlflow_experiment_name)
     mlflow.autolog(
-        log_input_examples=True,
-        log_model_signatures=True,
         log_models=False,
-        log_datasets=True,
-        log_traces=True,
     )
 
     run_name = f"infer_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}"
@@ -36,7 +32,6 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
     with mlflow.start_run(
         run_name=run_name,
         log_system_metrics=True,
-        tags={'test_tag': "hello"}
     ):
         for data_point in X_data:
             df = pd.DataFrame([data_point])
