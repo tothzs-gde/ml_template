@@ -36,8 +36,8 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
     drift_data_file_name = tags.get("drift-data") + '.csv'
     drift_reference_data = import_drift_data(filename=drift_data_file_name)
     drift_results = detect_drift(
-        drift_reference_data,
-        pd.DataFrame(X_data),
+        reference_df=drift_reference_data,
+        current_df=pd.DataFrame(X_data),
     )
     if len(drift_results):
         for col, result in drift_results.items():

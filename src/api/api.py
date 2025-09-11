@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+from src.model.datadrift import check_drift
 from src.model.train import train
 from src.model.evaluate import evaluate
 from src.model.inference import infer
@@ -86,4 +87,15 @@ def health_check():
 
 @router.post("/drift")
 async def api_evaluate():
-    pass
+    print("Calling DRIFT endpoint.")
+    try:
+        drift_results = check_drift()
+
+        for key in drift_results:
+            drift_results[key]["drifted"] = str(drift_results[key]["drifted"])
+
+        return {"status": "success", "drift_results": drift_results}
+    except Exception as e:
+        logger.error(e.with_traceback(e.__traceback__))
+        logger.error(traceback.format_exc())
+        return {"status": "failed"}
