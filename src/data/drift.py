@@ -1,7 +1,6 @@
 import pandas as pd
 from scipy.stats import ks_2samp, chisquare
 from sklearn.preprocessing import OrdinalEncoder
-import numpy as np
 
 def detect_drift(
     reference_df: pd.DataFrame,
