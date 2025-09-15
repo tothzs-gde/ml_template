@@ -1,0 +1,54 @@
+pipeline:
+  class: sklearn.pipeline.Pipeline
+  params:
+    steps:
+      - name: data_pipe
+        class: sklearn.pipeline.Pipeline
+        params:
+          steps:
+            - name: preprocessor
+              class: sklearn.compose.ColumnTransformer
+              params:
+                transformers:
+                  - name: num
+                    class: sklearn.pipeline.Pipeline
+                    columns: ['Age', 'SibSp', 'Parch', 'Fare']
+                    params:
+                      steps:
+                        - name: imputer
+                          class: sklearn.impute.SimpleImputer
+                          params:
+                            strategy: most_frequent
+                        - name: scaler
+                          class: sklearn.preprocessing.StandardScaler
+                  - name: cat
+                    class: sklearn.pipeline.Pipeline
+                    columns: ['Pclass', 'Sex', 'Embarked']
+                    params:
+                      steps:
+                        - name: imputer
+                          class: sklearn.impute.SimpleImputer
+                          params:
+                            strategy: most_frequent
+                        - name: encoder
+                          class: sklearn.preprocessing.OneHotEncoder
+            - name: feature_selector
+              class: sklearn.feature_selection.SelectKBest
+              params:
+                k: 'all'
+
+      - name: classifier
+        class: sklearn.linear_model.LogisticRegression
+
+
+search_parameters:
+  - data_pipe__preprocessor__num__imputer__strategy: ['mean', 'median']
+    data_pipe__preprocessor__num__scaler:
+      - null
+      - class: sklearn.preprocessing.StandardScaler
+    data_pipe__preprocessor__cat__imputer__strategy: ['most_frequent']
+    data_pipe__feature_selector__k: [1]
+    classifier:
+      - class: sklearn.linear_model.LogisticRegression
+    classifier__C: [0.1]
+    classifier__solver: ['lbfgs', 'liblinear', 'sag', 'saga']
