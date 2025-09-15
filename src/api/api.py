@@ -1,8 +1,5 @@
 import traceback
-from typing import Any
-
 from fastapi import APIRouter
-from pydantic import BaseModel
 
 from src.api.models import InferenceRequest
 from src.model.datadrift import check_drift
