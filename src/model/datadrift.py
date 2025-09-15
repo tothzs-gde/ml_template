@@ -8,7 +8,7 @@ def check_drift():
     '''
     '''
     with open("config/data_config.yaml", 'r') as file:
-            metadata = yaml.safe_load(file)
+        metadata = yaml.safe_load(file)
 
     index_columns = metadata['index_columns']
     target_column = metadata['target_column']
