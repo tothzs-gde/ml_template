@@ -4,6 +4,10 @@
 
 ## How to run
 
+### Demo
+
+The following commands clone the project from github, create a virtual environment for the notebooks, and deploys the app and it's related services.
+
 ```
 git clone git@github.com:tothzs-gde/ml_template.git
 cp app.env ml_template/app.env
@@ -11,26 +15,28 @@ cp manual.env ml_template/manual.env
 cd ml_template
 git checkout poc_1
 python -m venv venv_nb
-python -m venv venv_app
 
 source venv_nb/bin/activate
 pip install -r nb_requirements.txt
 deactivate
 
-source venv_app/bin/activate
-pip install -r app_requirements.txt
-deactivate
-
 podman-compose up --build
+```
 
+You can access the frontend of each service throught the following links.
+
+```
 # Swagger
 http://127.0.0.1:8000/docs#/
 # MLflow
 http://127.0.0.1:8080/
 # MinIO
 http://127.0.0.1:9001/
+```
 
+The following is a dummy data to test the inference endpoint.
 
+```
 # Dummy data to test the inference endpoint
 {
   "data": [
