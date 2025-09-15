@@ -4,6 +4,52 @@
 
 ## How to run
 
+```
+git clone git@github.com:tothzs-gde/ml_template.git
+cp app.env ml_template/app.env
+cp manual.env ml_template/manual.env
+cd ml_template
+git checkout poc_1
+python -m venv venv_nb
+python -m venv venv_app
+
+source venv_nb/bin/activate
+pip install -r nb_requirements.txt
+deactivate
+
+source venv_app/bin/activate
+pip install -r app_requirements.txt
+deactivate
+
+podman-compose up --build
+
+# Swagger
+http://127.0.0.1:8000/docs#/
+# MLflow
+http://127.0.0.1:8080/
+# MinIO
+http://127.0.0.1:9001/
+
+
+# Dummy data to test the inference endpoint
+{
+  "data": [
+    {
+      "Name": "Hello World",
+      "Ticket": "No.2356",
+      "Cabin": "front left",
+      "Pclass": 1,
+      "Sex": "male",
+      "Age": 21,
+      "SibSp": 1,
+      "Parch": 1,
+      "Fare": 40.5,
+      "Embarked": "S"
+    }
+  ]
+}
+```
+
 ### Running notebooks
 
 1. Create a virtual environment
