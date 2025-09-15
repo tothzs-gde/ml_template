@@ -26,7 +26,10 @@ class Settings(BaseSettings):
     minio_drift_bucket_name: str
 
     class Config:
-        env_file = "../app.env" if os.getcwd().split("/")[-1] == "notebooks" else "app.env"
+        env_file = \
+            "../manual.env" \
+            if os.getcwd().split("/")[-1] == "notebooks" \
+            else "app.env"
 
 
 settings = Settings()
