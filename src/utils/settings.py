@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings
 
 
@@ -24,11 +26,7 @@ class Settings(BaseSettings):
     minio_drift_bucket_name: str
 
     class Config:
-        env_file = "app.env"
+        env_file = "../app.env" if os.getcwd().split("/")[-1] == "notebooks" else "app.env"
 
 
 settings = Settings()
-
-if __name__ == "__main__":
-    settings = Settings()
-    print(settings)
