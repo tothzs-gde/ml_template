@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mlflow:
     build:
@@ -41,16 +39,14 @@ services:
     ports:
       - "5432:5432"
   
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: app.Dockerfile
-  #   env_file:
-  #     - ./app.env
-  #   container_name: ml_app
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - mlflow
-  #   networks:
-  #     - mlflow
+  app:
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    env_file:
+      - ./app.env
+    container_name: ml_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mlflow
