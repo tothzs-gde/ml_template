@@ -67,7 +67,7 @@ async def api_evaluate(
             model_name=model_name,
             model_version=model_version,
         )
-        return {"status": "success", "accuracy_score": score}
+        return {"status": "success", "model_performance": score}
     except Exception as e:
         logger.error(e.with_traceback(e.__traceback__))
         logger.error(traceback.format_exc())
