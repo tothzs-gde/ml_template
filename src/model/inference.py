@@ -44,14 +44,20 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
             logger.info(f"{col}: drifted={result['drifted']} (p={result['drift_score']:.4f})")
 
     # Predict
-    predictions = []
+    out = []
     with mlflow.start_run(
         run_name=run_name,
         log_system_metrics=True,
     ):
         for data_point in X_data:
-            df = pd.DataFrame([data_point])
-            predictions.extend(model.predict(df).tolist())
+            row_df = pd.DataFrame([data_point])
+            pred = model.predict(row_df)[0]
+            prob = model.predict_proba(row_df)[0]
+
+            out.append({
+                "prediction": int(pred),
+                "probabilities": prob.tolist(),
+            })
         
         drifted = False
         for col, results in drift_results.items():
@@ -61,4 +67,7 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
         
         mlflow.set_tag(f"data_drifted", str(drifted))
 
-    return predictions
+    logger.info("============================")
+    logger.info(out)
+
+    return out
