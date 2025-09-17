@@ -57,6 +57,7 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
         for col, results in drift_results.items():
             drifted = drifted and results["drifted"]
             mlflow.log_metric(f"drift_score_{col}", results["drift_score"])
+            mlflow.log_metric(f"drift_bool_{col}", results["drifted"])
         
         mlflow.set_tag(f"data_drifted", str(drifted))
 
