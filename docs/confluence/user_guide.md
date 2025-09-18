@@ -1,0 +1,1 @@
+How to use the project, run do EDA, ensure outputs, define model and hyperparams for search, how to train, what to do after
