@@ -1,6 +1,8 @@
 # ML Template
 
-[General, short description]
+[ML Template] is a MLaaS Framework, which is a reusable backend service for deploying machine learning workflows via a simple and extensible API. It supports key ML lifecycle operations including training, inference, evaluation, and data drift detection, and integrates with tools like MLflow and a model registry.
+
+Originally developed using the Titanic dataset for demonstration purposes, the framework is designed to be dataset-agnostic and easily reconfigurable for real-world use cases — enabling fast experimentation and deployment with minimal code changes.
 
 ## How to run
 
