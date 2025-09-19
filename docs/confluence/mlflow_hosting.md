@@ -30,11 +30,11 @@ Azure Machine Learning workspaces are MLflow-compatible, which means that you ca
 
 - You can run any training routine that uses MLflow in Azure Machine Learning without making any changes.
 
+**Pricing**: Pay as you go
+
 ### Model registry in Azure Machine Learning
 
 Azure Machine Learning supports MLflow for model management when connected to a workspace. This approach is a convenient way to support the entire model lifecycle for users familiar with the MLFlow client.
-
-**Pricing**: Pay as you go
 
 **Features**:
 
