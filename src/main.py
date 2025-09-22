@@ -1,15 +1,18 @@
 from contextlib import asynccontextmanager
-import os
 
 from fastapi import FastAPI
 
 from src.api.api import router
-from src.utils.minio import create_mlflow_bucket
+from src.utils.minio import (
+    create_drift_bucket,
+    create_mlflow_bucket,
+)
 from src.utils.settings import settings
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    create_drift_bucket()
     create_mlflow_bucket()
     yield
 

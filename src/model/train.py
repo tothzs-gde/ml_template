@@ -4,14 +4,19 @@ import mlflow
 from mlflow import MlflowClient
 from sklearn.model_selection import train_test_split
 
-from src.data.io import export_drift_data
-from src.data.io import load_from_csv
+from src.data.io import (
+    export_drift_data,
+    load_from_csv,
+)
 from src.model import RANDOM_SEED
 from src.utils.logging import logger
 from src.utils.settings import settings
 
 
-def train(model_name: str, model_version: str):
+def train(
+    model_name: str,
+    model_version: str,
+):
     ''' 
     '''
 
@@ -29,18 +34,18 @@ def train(model_name: str, model_version: str):
     logger.info(f"Start to train a new model ({model_name}) under {run_name=}")
 
     X_data, y_data = load_from_csv(
-        data_path='data/titanic.csv',
+        data_path="data/titanic.csv",
         config_path="config/data_config.yaml",
     )
 
     X_train, X_drift = train_test_split(
         X_data,
-        test_size=settings.test_split_size,
+        test_size=settings.drift_split_size,
         random_state=RANDOM_SEED,
     )
     y_train, y_drift = train_test_split(
         y_data,
-        test_size=settings.test_split_size,
+        test_size=settings.drift_split_size,
         random_state=RANDOM_SEED,
     )
 

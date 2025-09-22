@@ -7,29 +7,29 @@ class Settings(BaseSettings):
     '''
     '''
 
-    random_seed: int
-    test_split_size: float | int
+    random_seed: int = 42
+    drift_split_size: float | int = 0.1
     
     dataset: str
     dataset_test: str
 
-    mlflow_tracking_url: str
-    mlflow_experiment_name: str
-    mlflow_model_name: str
-    mlflow_registered_model_name: str
-    mlflow_s3_endpoint_url: str
+    mlflow_tracking_url: str = "http://mlflow:8080"
+    mlflow_experiment_name: str = "Titanic PoC"
+    mlflow_model_name: str = "titanic_model"
+    mlflow_registered_model_name: str = "sklearn-logreg-model"
+    mlflow_s3_endpoint_url: str = "http://minio:9000"
 
-    minio_url: str
-    aws_access_key_id: str
-    aws_secret_access_key: str
-    minio_mlflow_bucket_name: str
-    minio_drift_bucket_name: str
+    minio_url: str = "minio:9000"
+    aws_access_key_id: str = "minioadmin"
+    aws_secret_access_key: str = "minioadmin"
+    minio_mlflow_bucket_name: str = "mlflow"
+    minio_drift_bucket_name: str = "driftdata"
 
     class Config:
         env_file = \
             "../manual.env" \
             if os.getcwd().split("/")[-1] == "notebooks" \
-            else "app.env"
+            else "manual.env"
 
 
 settings = Settings()

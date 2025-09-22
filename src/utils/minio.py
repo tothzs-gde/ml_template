@@ -22,7 +22,7 @@ def create_mlflow_bucket():
 
 def create_drift_bucket():
     if not minio_client.bucket_exists(settings.minio_drift_bucket_name):
-        logger.info("MLflow bucket doesn't exist. Creating...")
+        logger.info("Drift bucket doesn't exist. Creating...")
         minio_client.make_bucket(settings.minio_drift_bucket_name)
     else:
-        logger.info("Using existing MLflow bucket")
+        logger.info("Using existing Drift bucket")

@@ -1,13 +1,18 @@
 import pandas as pd
-from scipy.stats import ks_2samp, chisquare
+from scipy.stats import (
+    ks_2samp,
+    chisquare,
+)
 from sklearn.preprocessing import OrdinalEncoder
 
-def detect_drift(
+def detect_drift_manual(
     reference_df: pd.DataFrame,
-    current_df: pd.DataFrame,
+    subject_df: pd.DataFrame,
     categorical_features=None,
     threshold=0.05
 ):
+    ''' Univariate drift detection test
+    '''
     if categorical_features is None:
         categorical_features = \
             reference_df \
@@ -22,15 +27,15 @@ def detect_drift(
     ]
 
     # Align columns
-    common_cols = [col for col in reference_df.columns if col in current_df.columns]
-    current_df = current_df[common_cols]
+    common_cols = [col for col in reference_df.columns if col in subject_df.columns]
+    subject_df = subject_df[common_cols]
 
     # Encode categorical features
     encoder = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1)
     reference_encoded = reference_df.copy()
-    current_encoded = current_df.copy()
+    current_encoded = subject_df.copy()
     reference_encoded[categorical_features] = encoder.fit_transform(reference_df[categorical_features])
-    current_encoded[categorical_features] = encoder.transform(current_df[categorical_features])
+    current_encoded[categorical_features] = encoder.transform(subject_df[categorical_features])
 
     drift_results = {}
 
