@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import yaml
 from evidently import (
@@ -46,7 +48,7 @@ def detect_drift(
     drift_results = {}
     for col_eval in evaluation.dict()['metrics']:
         if col_eval['metric_id'].startswith('ValueDrift'):
-            drift_results[col_eval['metric_id']] = {
+            drift_results[re.sub(r"[^a-zA-Z0-9_\-.:/ ]+", "", col_eval['metric_id'])] = {
                 "drift_score": col_eval['value'],
                 "drifted": col_eval['value'] < threshold,
             }

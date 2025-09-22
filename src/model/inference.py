@@ -4,7 +4,7 @@ from typing import Any
 import mlflow
 import pandas as pd
 
-from src.data.drift import detect_drift
+from src.data.drift import detect_drift_manual
 from src.data.io import import_drift_data
 from src.utils.logging import logger
 from src.utils.settings import settings
@@ -35,9 +35,9 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
     tags = model_version_details.tags
     drift_data_file_name = tags.get("drift-data") + '.csv'
     drift_reference_data = import_drift_data(filename=drift_data_file_name)
-    drift_results = detect_drift(
+    drift_results = detect_drift_manual(
         reference_df=drift_reference_data,
-        current_df=pd.DataFrame(X_data),
+        subject_df=pd.DataFrame(X_data),
     )
     if len(drift_results):
         for col, result in drift_results.items():

@@ -20,8 +20,8 @@ def check_drift():
         usecols=cols,
     )
 
-    report = detect_drift(reference_df=X_ref, subject_df=X_sub)
-    print(report)
+    drift_results = detect_drift(reference_df=X_ref, subject_df=X_sub)
+    return drift_results
 
 if __name__ == "__main__":
     check_drift()
