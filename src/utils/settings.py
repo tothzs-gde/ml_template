@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     minio_mlflow_bucket_name: str = "mlflow"
     minio_drift_bucket_name: str = "driftdata"
 
+    postgres_db: str = "postgres"
+    postgres_user: str = "user"
+    postgres_password: str = "password"
+    postgres_port: int = 5432
+
     class Config:
         env_file = \
             "../manual.env" \

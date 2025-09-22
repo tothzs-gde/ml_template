@@ -1,13 +1,7 @@
 import pandas as pd
 import yaml
-    
-from evidently import Dataset
-from evidently import DataDefinition
-from evidently import Report
-from evidently.presets import (
-    DataDriftPreset,
-    DataSummaryPreset,
-)
+
+from src.data.drift import detect_drift
 
 
 def check_drift():
@@ -17,34 +11,17 @@ def check_drift():
         metadata = yaml.safe_load(file)
 
     cols = metadata['numerical_features'] + metadata['categorical_features']
-    schema = DataDefinition(
-        numerical_columns=metadata['numerical_features'],
-        categorical_columns=metadata['categorical_features'],
+    X_ref = pd.read_csv(
+        'data/titanic.csv',
+        usecols=cols,
+    )
+    X_sub = pd.read_csv(
+        'data/titanic_test.csv',
+        usecols=cols,
     )
 
-    X_ref = Dataset.from_pandas(
-        pd.read_csv(
-            'data/titanic.csv',
-            usecols=cols,
-        ),
-        data_definition=schema,
-    )
-    X_sub = Dataset.from_pandas(
-        pd.read_csv(
-            'data/titanic_test.csv',
-            usecols=cols,
-        ),
-        data_definition=schema,
-    )
-
-    report = Report([
-        DataDriftPreset(),
-        DataSummaryPreset(),
-    ])
-
-    my_eval = report.run(X_sub, X_ref)
-    
-    return my_eval
+    report = detect_drift(reference_df=X_ref, subject_df=X_sub)
+    print(report)
 
 if __name__ == "__main__":
     check_drift()

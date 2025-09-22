@@ -1,15 +1,63 @@
 import pandas as pd
+import yaml
+from evidently import (
+    Dataset,
+    DataDefinition,
+    Report,
+)
+from evidently.presets import (
+    DataDriftPreset,
+)
 from scipy.stats import (
     ks_2samp,
     chisquare,
 )
 from sklearn.preprocessing import OrdinalEncoder
 
+
+def detect_drift(
+    reference_df: pd.DataFrame,
+    subject_df: pd.DataFrame,
+    threshold=0.05,
+):
+    with open("config/data_config.yaml", 'r') as file:
+        metadata = yaml.safe_load(file)
+
+    schema = DataDefinition(
+        numerical_columns=metadata['numerical_features'],
+        categorical_columns=metadata['categorical_features'],
+    )
+
+    X_ref = Dataset.from_pandas(
+        reference_df,
+        data_definition=schema,
+    )
+    X_sub = Dataset.from_pandas(
+        subject_df,
+        data_definition=schema,
+    )
+
+    report = Report([
+        DataDriftPreset(),
+    ])
+
+    evaluation = report.run(X_sub, X_ref)
+
+    drift_results = {}
+    for col_eval in evaluation.dict()['metrics']:
+        if col_eval['metric_id'].startswith('ValueDrift'):
+            drift_results[col_eval['metric_id']] = {
+                "drift_score": col_eval['value'],
+                "drifted": col_eval['value'] < threshold,
+            }
+    return drift_results
+
+
 def detect_drift_manual(
     reference_df: pd.DataFrame,
     subject_df: pd.DataFrame,
     categorical_features=None,
-    threshold=0.05
+    threshold=0.05,
 ):
     ''' Univariate drift detection test
     '''
