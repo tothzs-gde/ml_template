@@ -54,4 +54,21 @@ Azure Machine Learning supports MLflow for model management when connected to a 
 
 - Cross-workspace operations aren't currently supported in Machine Learning.
 
+```
+AzureML - Extra features
+├── Edit & run notebooks on the platform
+├── Dataset registry
+│   ├── View data
+│   └── View data stats / quality (min, max, missing etc.)
+├── Built-in data drift monitoring
+│   ├── Detection scheduling (Run daily, weekly)
+│   ├── Alerting to email
+│   └── Auto retrain model on alert
+├── Scheduled code execution
+├── Better compute management (cpu, ram, gpu, tpu valaszthato)
+├── Pipelines
+├── AutoML
+└── No code machine learning
+```
+
 Ref: [Manage models registry in Azure Machine Learning with MLflow](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-models-mlflow?view=azureml-api-2)
