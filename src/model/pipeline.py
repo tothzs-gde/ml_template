@@ -13,30 +13,13 @@ def _import_class(class_path: str) -> Type:
 def _instantiate_component(component_config: dict[str, Any]) -> Any:
     cls = _import_class(component_config["class"])
     params = component_config.get("params", {})
-
     for key, val in params.items():
-        if isinstance(val, list) and key == "steps":
-            new_steps = []
-            for step_cfg in val:
-                step_name = step_cfg["name"]
-                step_obj = _instantiate_component(step_cfg)
-                new_steps.append((step_name, step_obj))
-            params[key] = new_steps
-
-        elif isinstance(val, list) and key == "transformers":
-            new_transformers = []
-            for transformer_cfg in val:
-                transformer_name = transformer_cfg["name"]
-                transformer_obj = _instantiate_component(transformer_cfg)
-                transformer_columns = transformer_cfg["columns"]
-                new_transformers.append(
-                    (transformer_name, transformer_obj, transformer_columns)
-                )
-            params[key] = new_transformers
-
-        elif isinstance(val, dict) and "class" in val:
-            params[key] = _instantiate_component(val)
-
+        if key in ["transformers", "steps"]:
+            params[key] = [(
+                (item.get("name"), _instantiate_component(item), item.get("columns"))
+                if item.get("columns")
+                else (item.get("name"), _instantiate_component(item))
+            ) for item in val]
     return cls(**params)
 
 
