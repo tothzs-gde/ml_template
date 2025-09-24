@@ -23,6 +23,8 @@ search_parameters: <hyperparameter search list>
 
 Defines the full structure of the ML pipeline, including all preprocessing steps, transformers, feature selectors, classifiers, etc.
 
+---
+
 ### Structure
 
 The pipeline is defined as a nested tree similarly how a complete sklearn pipeline is represented in text format. Each node must contain at least a `class` key, optionally can define a `params` key, and recommended to have a `name` key, where
@@ -67,6 +69,8 @@ params:
   copy: false
 ```
 
+---
+
 ### Special components
 
 Components that accept a list of subcomponents in one of their parameters (currently ColumnTransformer and Pipeline are supported) must define these subcomponents in a yaml list.
@@ -96,6 +100,8 @@ params:
       class: package.module.class
       columns: ['d', 'e']
 ```
+
+---
 
 ### Complete example pipeline definition
 
