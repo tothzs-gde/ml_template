@@ -34,8 +34,6 @@ In this scheme, each experiment run could log:
 
 Then, when you later inspect a run, you know precisely which dataset artifact was tied to that run.
 
-###### Some teams even bake custom “dataset-flavors” so that datasets are treated as first-class tracked artifacts in MLflow (or attach dataset version IDs as tags).
-
 ### Pros
 
 - **Tight association with the experiment**: it’s very clear which dataset version was used in that run.
