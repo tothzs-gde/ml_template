@@ -2,19 +2,20 @@ import re
 
 import pandas as pd
 import yaml
-from evidently import (
-    Dataset,
-    DataDefinition,
-    Report,
-)
-from evidently.presets import (
-    DataDriftPreset,
-)
-from scipy.stats import (
-    ks_2samp,
-    chisquare,
-)
+from evidently import Dataset
+from evidently import DataDefinition
+from evidently import Report
+from evidently.presets import DataDriftPreset
+from scipy.stats import ks_2samp
+from scipy.stats import chisquare
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.compose import ColumnTransformer
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder
 
 
 def detect_drift(
@@ -76,11 +77,9 @@ def detect_drift_manual(
         if col not in categorical_features
     ]
 
-    # Align columns
     common_cols = [col for col in reference_df.columns if col in subject_df.columns]
     subject_df = subject_df[common_cols]
 
-    # Encode categorical features
     encoder = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1)
     reference_encoded = reference_df.copy()
     current_encoded = subject_df.copy()
@@ -120,3 +119,82 @@ def detect_drift_manual(
         }
 
     return drift_results
+
+
+def detect_drift_model_based(
+    reference_df: pd.DataFrame,
+    subject_df: pd.DataFrame,
+    random_state: int,
+):
+    """
+    Model based drift detection algorithm. This function trains a Random Forest
+    classified model on the mix of two datasets. Data drift is detected based on
+    the model's ability to separate the datasets.
+
+    Args:
+        reference_df (pd.DataFrame): Drift reference dataset
+        subject_df (pd.DataFrame): Test subject dataset
+        random_state (int): Seed used when shuffling the two datasets.
+    """
+
+    reference_df['DRIFT_TARGET'] = 0
+    subject_df['DRIFT_TARGET'] = 1
+
+    shuffled_df = \
+        pd.concat([reference_df, subject_df], axis=0) \
+        .sample(frac=1, random_state=random_state) \
+        .reset_index(drop=True)
+
+    X = shuffled_df.drop('DRIFT_TARGET', axis=1)
+    y = shuffled_df['DRIFT_TARGET']
+
+    categorical_cols = X.select_dtypes(include=['object', 'category']).columns.tolist()
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
+        ],
+        remainder='passthrough'
+    )
+    pipeline = Pipeline(steps=[
+        ('preprocessor', preprocessor),
+        ('classifier', RandomForestClassifier(random_state=random_state))
+    ])
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    pipeline.fit(X_train, y_train)
+    y_pred = pipeline.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+
+    print(acc)
+    print(report)
+
+
+if __name__ == "__main__":
+    import numpy as np
+
+    SEED = 42
+    np.random.seed(SEED)
+
+    N_ROWS = 100
+    def gen_random_df(n_rows: int):
+        numerical_data = {
+            'num1': np.random.rand(n_rows) * 100,
+            'num2': np.random.randint(0, 50, n_rows),
+            'num3': np.random.normal(0, 1, n_rows)
+        }
+        categorical_data = {
+            'cat1': np.random.choice(['A', 'B', 'C'], n_rows),
+            'cat2': np.random.choice(['X', 'Y'], n_rows)
+        }
+        return pd.DataFrame({**numerical_data, **categorical_data})
+    
+    ref_df = gen_random_df(N_ROWS)
+    sub_df = gen_random_df(N_ROWS)
+
+    detect_drift_model_based(
+        reference_df=ref_df,
+        subject_df=sub_df,
+        random_state=SEED,
+    )
