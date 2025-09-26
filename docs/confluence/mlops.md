@@ -22,6 +22,12 @@
 
     4.5. Update drift dataset or clean up if new model is worse
 
+### Model evaluation:
+
+- Compare new model to current production on a holdout or recent live dataset
+- Use task-specific metrics: e.g., F1 for classification, RMSE for regression
+- Optionally: deploy new model in shadow mode and compare predictions before promoting
+
 ## Logging
 
 ### Request logs
@@ -57,13 +63,13 @@
 
 ### Drift logs
 
-**Univariate tests**:
+**Univariate tests** (Evidently):
 - feature_name: str
 - drifted: bool
 - p-value: float
 - threshold: float
 
-**Multivariate model-based tests**:
+**Multivariate model-based tests** (Custom):
 - drifted: bool
 - model_accuracy: float
 - threshold: float
