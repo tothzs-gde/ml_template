@@ -1,6 +1,28 @@
 # MLOps
 
-## Request capture
+## Lifecycle
+
+0. Deploy services (MLflow, Postgres, MinIO (or equivalent), Grafana)
+
+1. Exploratory data analysis (EDA)
+
+2. Manually train a model
+
+3. Promote the trained model to `stage: prod`
+
+4. Automated model lifecycle management
+
+    4.1. Inference call
+
+    4.2. Drift detection
+
+    4.3. Trigger model training
+
+    4.4. Promote new model if it is better than the previous
+
+    4.5. Update drift dataset or clean up if new model is worse
+
+## Request logging
 
 - **timestamp**: When was the request made
 - **request_id**: Unique id for the request. Useful to filter logs for the same request.
@@ -11,14 +33,14 @@
 - **confidence**: Model output confidence if applicable.
 - **metadata**: Any other metadata worth logging.
 
-## Logging strategy
+### Strategy
 
 - Batch logging.
 - Flush every `N` records or when `flush interval > X seconds`
 - Upload logs to blob storage
 - Use Grafana for monitoring and alerting
 
-## Logging format
+### Format
 
 |   | JSONL | Parquet |
 |---|---|---|
@@ -29,7 +51,7 @@
 | Schema | Flexible | Strict |
 | File size | <50MB | 50MB-1GB |
 
-## Metrics to log
+## Monitoring
 
 ### Service metrics
 - Uptime / health check
