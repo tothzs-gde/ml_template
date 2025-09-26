@@ -63,6 +63,11 @@
 
 ### Drift logs
 
+**Common**:
+- timestamp
+- reference_dataset_id
+- subject_dataset_id
+
 **Univariate tests** (Evidently):
 - feature_name: str
 - drifted: bool
