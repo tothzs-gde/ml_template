@@ -22,7 +22,9 @@
 
     4.5. Update drift dataset or clean up if new model is worse
 
-## Request logging
+## Logging
+
+### Request logs
 
 - **timestamp**: When was the request made
 - **request_id**: Unique id for the request. Useful to filter logs for the same request.
@@ -36,9 +38,9 @@
 ### Strategy
 
 - Batch logging.
-- Flush every `N` records or when `flush interval > X seconds`
-- Upload logs to blob storage
-- Use Grafana for monitoring and alerting
+- Flush every `N` records or when `flush interval > X seconds`.
+- Upload logs to blob storage.
+- Use Grafana for monitoring and alerting.
 
 ### Format
 
@@ -50,6 +52,36 @@
 | Readability | Human-readable | Not human-readable, binary format |
 | Schema | Flexible | Strict |
 | File size | <50MB | 50MB-1GB |
+
+## Drift detection
+
+### Drift logs
+
+**Univariate tests**:
+- feature_name: str
+- drifted: bool
+- p-value: float
+- threshold: float
+
+**Multivariate model-based tests**:
+- drifted: bool
+- model_accuracy: float
+- threshold: float
+
+### Strategy
+
+- Run both univariate and multivariate model-based tests.
+- Run tests in a separate process than the model inference / training
+- Use scheduled runs:
+    - Every X hour on the last X hour's data.
+    - Every hour with a sliding window of X hours.
+    - Run once a day.
+
+### Alerting
+
+- Send email / message on drift detection
+- Trigger retraining of the model
+- Explicitly log drift detection event
 
 ## Monitoring
 
