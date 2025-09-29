@@ -18,7 +18,7 @@ async def api_train(
     model_name: str = settings.mlflow_registered_model_name,
     model_version: str = "latest",
 ):
-    print("Calling TRAIN endpoint.")
+    logger.info("Calling TRAIN endpoint.")
     try:
         run_name, new_model_name, new_model_version = train(
             model_name=model_name,
@@ -42,7 +42,7 @@ async def api_inference(
     model_name: str = settings.mlflow_registered_model_name,
     model_version: str = "latest",
 ):
-    print("Calling INFERENCE endpoint.")
+    logger.info("Calling INFERENCE endpoint.")
     try:
         predictions = infer(
             X_data = request.data,
@@ -61,7 +61,7 @@ async def api_evaluate(
     model_name: str = settings.mlflow_registered_model_name,
     model_version: str = "latest",
 ):
-    print("Calling EVALUATE endpoint.")
+    logger.info("Calling EVALUATE endpoint.")
     try:
         score = evaluate(
             model_name=model_name,
@@ -76,12 +76,13 @@ async def api_evaluate(
 
 @router.get("/health")
 def health_check():
+    logger.info("Calling HEALTH endpoint.")
     return {"status": "ok"}
 
 
 @router.post("/drift")
 async def api_evaluate():
-    print("Calling DRIFT endpoint.")
+    logger.info("Calling DRIFT endpoint.")
     try:
         drift_results = check_drift()
 
