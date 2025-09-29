@@ -4,10 +4,8 @@ import mlflow
 from mlflow import MlflowClient
 from sklearn.model_selection import train_test_split
 
-from src.data.io import (
-    export_drift_data,
-    load_from_csv,
-)
+from src.data.io import export_drift_data
+from src.data.io import load_from_csv
 from src.model import RANDOM_SEED
 from src.utils.logging import logger
 from src.utils.settings import settings
