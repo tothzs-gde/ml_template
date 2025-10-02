@@ -1,39 +1,48 @@
 import contextvars
+import json
 import logging
+import time
 from logging.handlers import RotatingFileHandler
 
 
-class RequestIdFilter(logging.Filter):
-    def __init__(self, ctx, name = ""):
-        super().__init__(name)
-        self._ctx = ctx
+class JSONLogFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        log_record = {
+            "correlation_id": correlation_id_ctx.get(),
+            "timestamp": int(time.time() * 1000),
+            "level": record.levelname,
+            "pathname": record.pathname,
+            "lineno": record.lineno,
+            "process_id": record.process,
+            "message": record.getMessage(),
+        }
 
+        if hasattr(record, "extra_data") and isinstance(record.extra_data, dict):
+            log_record.update(record.extra_data)
+        
+        return json.dumps(log_record)
+
+
+class CorrelationIdFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        record.request_id = self._ctx.get("-")
+        record.correlation_id = correlation_id_ctx.get("-")
         return True
 
 
-def _instantiate_logger():
-    logger = logging.getLogger("app")
-    formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)s - [request_id=%(request_id)s] - %(message)s"
-    )
+def get_logger():
     handler = RotatingFileHandler(
-        filename="app",
+        filename="logs/app.log",
         maxBytes=5*1024*1024,
         backupCount=5,
         encoding="utf-8",
     )
-    handler.setFormatter(formatter)
-    handler.addFilter(
-         RequestIdFilter(request_id_ctx, name="request_id_filter")
-    )
-
-    logger.addHandler(handler)
+    handler.setFormatter(JSONLogFormatter())
+    logger = logging.getLogger("app")
     logger.setLevel(logging.INFO)
-    logger.propagate = False
+    logger.addHandler(handler)
+    logger.addFilter(CorrelationIdFilter("CorrelationIdFilter"))
     return logger
 
 
-request_id_ctx = contextvars.ContextVar("request_id", default="-")
-logger = _instantiate_logger()
+correlation_id_ctx = contextvars.ContextVar("correlation_id", default="-")
+logger = get_logger()

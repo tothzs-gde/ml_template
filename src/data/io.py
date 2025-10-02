@@ -67,7 +67,6 @@ def export_drift_data(
     with BytesIO() as buffer:
         df.to_csv(buffer, index=False)
         buffer.seek(0)
-
         minio_client.put_object(
             bucket_name=settings.minio_drift_bucket_name,
             object_name=filename,

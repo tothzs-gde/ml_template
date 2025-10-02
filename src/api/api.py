@@ -1,7 +1,8 @@
 import traceback
 from fastapi import APIRouter
+from fastapi import HTTPException
 
-from src.api.models import InferenceRequest
+from src.api.api_models import InferenceRequest
 from src.model.datadrift import check_drift
 from src.model.train import train
 from src.model.evaluate import evaluate
@@ -33,7 +34,10 @@ async def api_train(
     except Exception as e:
         logger.error(e.with_traceback(e.__traceback__))
         logger.error(traceback.format_exc())
-        return {"status": "failed"}
+        raise HTTPException(
+            status_code=500,
+            detail="Training failed due to an internal error.",
+        )
 
 
 @router.post("/inference")
@@ -53,7 +57,10 @@ async def api_inference(
     except Exception as e:
         logger.error(e.with_traceback(e.__traceback__))
         logger.error(traceback.format_exc())
-        return {"status": "failed"}
+        raise HTTPException(
+            status_code=500,
+            detail="Inference failed due to an internal error.",
+        )
 
 
 @router.post("/evaluate")
@@ -71,7 +78,10 @@ async def api_evaluate(
     except Exception as e:
         logger.error(e.with_traceback(e.__traceback__))
         logger.error(traceback.format_exc())
-        return {"status": "failed"}
+        raise HTTPException(
+            status_code=500,
+            detail="Evaluation failed due to an internal error.",
+        )
 
 
 @router.get("/health")
@@ -93,4 +103,7 @@ async def api_evaluate():
     except Exception as e:
         logger.error(e.with_traceback(e.__traceback__))
         logger.error(traceback.format_exc())
-        return {"status": "failed"}
+        raise HTTPException(
+            status_code=500,
+            detail="Drift detection failed due to an internal error.",
+        )

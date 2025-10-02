@@ -46,14 +46,47 @@ services:
       - ./initdb:/docker-entrypoint-initdb.d:Z
     restart: unless-stopped
   
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: app.Dockerfile
-  #   env_file:
-  #     - ./app.env
-  #   container_name: ml_app
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - mlflow
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/promtail.yaml:Z
+      - ./logs:/app/logs:Z
+    command: -config.file=/etc/promtail/promtail.yaml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:Z
+      - ./grafana/dashboards:/etc/grafana/dashboards:Z
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+  
+  app:
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    env_file:
+      - ./app.env
+    container_name: ml_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mlflow
+
+volumes:
+  grafana-storage:

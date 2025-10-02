@@ -2,6 +2,7 @@ import pandas as pd
 import yaml
 
 from src.data.drift import detect_drift
+from src.data.drift import detect_drift_model_based
 
 
 def check_drift():
@@ -21,6 +22,7 @@ def check_drift():
     )
 
     drift_results = detect_drift(reference_df=X_ref, subject_df=X_sub)
+    detect_drift_model_based(reference_df=X_ref, subject_df=X_sub)
     return drift_results
 
 if __name__ == "__main__":

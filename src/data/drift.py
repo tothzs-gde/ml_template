@@ -1,5 +1,6 @@
 import re
 
+import numpy as np
 import pandas as pd
 import yaml
 from evidently import Dataset
@@ -12,10 +13,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
+from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import OneHotEncoder
+
+from src.utils.logging import logger
 
 
 def detect_drift(
@@ -124,7 +128,8 @@ def detect_drift_manual(
 def detect_drift_model_based(
     reference_df: pd.DataFrame,
     subject_df: pd.DataFrame,
-    random_state: int,
+    random_state: int | None = None,
+    threshold: float = 0.5,
 ):
     """
     Model based drift detection algorithm. This function trains a Random Forest
@@ -166,6 +171,16 @@ def detect_drift_model_based(
     y_pred = pipeline.predict(X_test)
     acc = accuracy_score(y_test, y_pred)
     report = classification_report(y_test, y_pred)
+
+    score = np.abs(acc-0.5) * 2
+    drifted = score > threshold
+    
+    log_data = {
+        "drift_test": "model-based",
+        "drifted": str(drifted),
+        "score": score
+    }
+    logger.info("Model based drift detection completed", extra={"extra_data": log_data})
 
     print(acc)
     print(report)
