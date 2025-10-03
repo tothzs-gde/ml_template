@@ -52,11 +52,16 @@ def detect_drift(
 
     drift_results = {}
     for col_eval in evaluation.dict()['metrics']:
-        if col_eval['metric_id'].startswith('ValueDrift'):
-            drift_results[re.sub(r"[^a-zA-Z0-9_\-.:/ ]+", "", col_eval['metric_id'])] = {
+        match = re.search(r'ValueDrift\(column=(\w+)\)', col_eval['metric_id'])
+        if match:
+            drift_results[match.group(1)] = {
+                "drift_test": "evidently",
+                "column": match.group(1),
                 "drift_score": col_eval['value'],
-                "drifted": col_eval['value'] < threshold,
+                "drifted": str(col_eval['value'] < threshold),
             }
+    for value in drift_results.values():
+        logger.info("Evidently drift detection completed", extra={"extra_data": value})
     return drift_results
 
 
@@ -180,10 +185,10 @@ def detect_drift_model_based(
         "drifted": str(drifted),
         "score": score
     }
-    logger.info("Model based drift detection completed", extra={"extra_data": log_data})
+    logger.info("Model-based drift detection completed", extra={"extra_data": log_data})
 
-    print(acc)
-    print(report)
+    # print(acc)
+    # print(report)
 
 
 if __name__ == "__main__":

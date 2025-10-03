@@ -4,9 +4,10 @@ from typing import Any
 import mlflow
 import pandas as pd
 
-from src.data.drift import detect_drift_manual
+from src.data.drift import detect_drift
 from src.data.drift import detect_drift_model_based
 from src.data.io import import_drift_data
+from src.data.quality import check_data_quality
 from src.utils.logging import logger
 from src.utils.settings import settings
 
@@ -36,13 +37,13 @@ def infer(X_data: list[dict[str, Any]], model_name: str, model_version: str):
     tags = model_version_details.tags
     drift_data_file_name = tags.get("drift-data") + '.csv'
     drift_reference_data = import_drift_data(filename=drift_data_file_name)
-    drift_results = detect_drift_manual(
+    check_data_quality(
+        df=pd.DataFrame(X_data),
+    )
+    drift_results = detect_drift(
         reference_df=drift_reference_data,
         subject_df=pd.DataFrame(X_data),
     )
-    if len(drift_results):
-        for col, result in drift_results.items():
-            logger.info(f"{col}: drifted={result['drifted']} (p={result['drift_score']:.4f})")
     detect_drift_model_based(
         reference_df=drift_reference_data,
         subject_df=pd.DataFrame(X_data),
